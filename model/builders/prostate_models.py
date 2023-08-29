@@ -13,6 +13,7 @@ from model.layers_custom import f1, Diagonal, SparseTF
 from model.model_utils import print_model, get_layers
 
 
+
 # assumes the first node connected to the first n nodes and so on
 def build_pnet(optimizer, w_reg, add_unk_genes=True, sparse=True, dropout=0.5, use_bias=False, activation='tanh',
                loss='binary_crossentropy', data_params=None, n_hidden_layers=1, direction='root_to_leaf',
@@ -107,8 +108,8 @@ def build_pnet(optimizer, w_reg, add_unk_genes=True, sparse=True, dropout=0.5, u
 # assumes the first node connected to the first n nodes and so on
 def build_pnet2(optimizer, w_reg, w_reg_outcomes, add_unk_genes=True, sparse=True, loss_weights=1.0, dropout=0.5,
                 use_bias=False, activation='tanh', loss='binary_crossentropy', data_params=None, n_hidden_layers=1,
-                direction='root_to_leaf', batch_normal=False, kernel_initializer='glorot_uniform', shuffle_genes=False,
-                attention=False, dropout_testing=False, non_neg=False, repeated_outcomes=True, sparse_first_layer=True):
+                direction='root_to_leaf', batch_normal=False, kernel_initializer='glorot_uniform', shuffle_genes=True,
+                attention=False, dropout_testing=False, non_neg=False, repeated_outcomes=True, sparse_first_layer=True, single_outputs=True):
     print(data_params)
     print('n_hidden_layers', n_hidden_layers)
     data = Data(**data_params)
@@ -119,9 +120,15 @@ def build_pnet2(optimizer, w_reg, w_reg_outcomes, add_unk_genes=True, sparse=Tru
     print(cols.shape)
     features = cols
     if loss == 'binary_crossentropy':
-        activation_decision = 'sigmoid'
+        activation_decision = 'sigmoid' # the primary is sigmoid 
     else:
         activation_decision = 'linear'
+    
+    if single_outputs:
+        activation_decision = 'linear' 
+    else: 
+        activation_decision = 'sigmoid'
+        
     logging.info('x shape {} , y shape {} info {} genes {}'.format(x.shape, y.shape, info.shape, cols.shape))
 
     logging.info('x shape {} , y shape {} info {} genes {}'.format(x.shape, y.shape, info.shape, cols.shape))
@@ -167,9 +174,15 @@ def build_pnet2(optimizer, w_reg, w_reg_outcomes, add_unk_genes=True, sparse=Tru
         outcome = decision_outcomes
     else:
         outcome = decision_outcomes[-1]
-
-#     model = Model(input=[ins], output=outcome)
-    model = Model(inputs=[ins], outputs=outcome)
+#################################################################################### SMMH add it
+    if single_outputs :
+        # Concatenate the output tensors
+        concatenated_outputs = Concatenate(axis=-1)(decision_outcomes)
+        # Add a dense layer with one node
+        final_output = Dense(1, activation='sigmoid')(concatenated_outputs) # linear 
+        model = Model(inputs=[ins], outputs=final_output)
+####################################################################################
+    else: model = Model(inputs=[ins], outputs=outcome)
 
     if type(outcome) == list:
         n_outputs = len(outcome)

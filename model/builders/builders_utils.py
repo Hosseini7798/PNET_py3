@@ -158,8 +158,6 @@ def get_pnet(inputs, features, genes, n_hidden_layers, direction, activation, ac
 
     # if reg_outcomes:
     # decision_outcome = Dense(1, activation='linear', name='o_linear{}'.format(1), W_regularizer=reg_l(w_reg_outcome1/2.), **constraints)(outcome)
-    decision_outcome = Dense(1, activation='linear', name='o_linear{}'.format(1),
-                             kernel_regularizer=reg_l(w_reg_outcome1 / 2.))(outcome)
     # else:
     #     decision_outcome = Dense(1, activation='linear', name='o_linear{}'.format(1))(outcome)
 
