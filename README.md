@@ -21,11 +21,17 @@ Make sure you have Python 3 installed. You can find the list of required package
 
 2. Depending on your intended use, you might need to download one or more of the following:
 
-   a. **Data Files:** These are required for retraining models and generating figures. Extract the data files under the `_database` directory. If you prefer to store them in a different location, adjust the `DATA_PATH` variable in `config_path.py` accordingly.
+   a. [Data files](https://drive.google.com/uc?id=17nssbdUylkyQY1ebtxsIw5UzTAd0zxWb&export=download) (needed to retrain
+   models and generate figures). Extract the files under ```_database``` directory. If you like to store it somewhere
+   else, you may need to set the ```DATA_PATH``` variable in ```config_path.py``` accordingly.
 
-   b. **Log Files:** These are needed to regenerate figures from the paper. Extract the log files under the `_logs` directory. If you want to use a different directory, modify the `LOG_PATH` variable in `config_path.py`.
+   b. [Log files](https://drive.google.com/uc?id=18dJ5fWvJyISROkLRCUMfhsrwZ_iNXSNP&export=download) (needed to
+   regenerate paper figures). Extract the files under ```_logs``` directory. If you like to store it somewhere else, you
+   may need to set the ```LOG_PATH``` variable in ```config_path.py``` accordingly.
 
-   c. **Plot Files:** This directory contains copies of the paper's images. Extract these files under the `_plots` directory. If you wish to store them elsewhere, make changes to the `PLOTS_PATH` variable in `config_path.py`.
+   c. [Plots files](https://drive.google.com/uc?id=1DiZB8qvZqVXs9HyDCF7bCFOr_T1ER7Ku&export=download) (a copy of the
+   paper images). Extract the files under ```_plots``` directory. If you like to store it somewhere else, you may need
+   to set the ```PLOTS_PATH``` variable in ```config_path.py``` accordingly.
 
 ## Usage
 
