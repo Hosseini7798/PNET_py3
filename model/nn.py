@@ -229,12 +229,7 @@ class Model(BaseEstimator):
             validation_data = [X_val, y_val]
         else:
             validation_data = []
-        print("#"*50)
-        print(self.model.__dict__)
-        print("#"*50)
-        print(self.n_outputs)
-        print("#"*50)
-        print(self.model.summary())
+
         history = self.model.fit(X_train, y_train, validation_data=validation_data,
                                  epochs=self.nb_epoch,
                                  batch_size=self.batch_size,
