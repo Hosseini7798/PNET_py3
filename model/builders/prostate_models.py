@@ -201,7 +201,7 @@ def build_pnet2(optimizer, w_reg, w_reg_outcomes, add_unk_genes=True, sparse=Tru
     logging.info('done compiling')
 
     print_model(model)
-    print(get_layers(model))
+#     print(get_layers(model))
     logging.info(model.summary())
     logging.info('# of trainable params of the model is %s' % model.count_params())
     return model, feature_names

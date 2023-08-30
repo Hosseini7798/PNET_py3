@@ -189,7 +189,14 @@ def get_pnet(inputs, features, genes, n_hidden_layers, direction, activation, ac
         w_regs = w_reg[1:]
         w_reg_outcomes = w_reg_outcomes[1:]
         dropouts = dropout[1:]
-        print("mapp is:")
+        print(sum(maps[0].sum(axis=1)>0), maps[0].values.sum())
+        print(sum(maps[1].sum(axis=1)>0), maps[1].values.sum())
+        print(sum(maps[2].sum(axis=1)>0), maps[2].values.sum())
+        print(sum(maps[3].sum(axis=1)>0), maps[3].values.sum())
+        print(sum(maps[4].sum(axis=1)>0), maps[4].values.sum())
+        print(sum(maps[5].sum(axis=1)>0), maps[5].values.sum())
+        
+        print("map is:")
         print("maps[0]",len(maps[0]))
         print("maps[1]",len(maps[1]))
         print("maps[2]",len(maps[2]))
