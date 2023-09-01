@@ -15,7 +15,7 @@
 #  'Thyroid', 'Uterus', 'Vagina', 'Whole Blood']
 
 # select tissues name from GTEx columns(from above list)
-tissues = ['Esophagus - Mucosa', 'Testis','Stomach','Prostate'] 
+tissues = ['Thyroid', 'Testis','Pancreas','Stomach','Prostate'] 
 n_hidden_layers = 5
 direction = 'root_to_leaf'
 add_unk_genes = False
