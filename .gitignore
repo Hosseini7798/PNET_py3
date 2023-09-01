@@ -1,0 +1,7 @@
+**/.DS_Store
+**/__pycache__/
+.ipynb_checkpoints/
+**/_database/
+_logs/
+_plots 2/
+pnet*
