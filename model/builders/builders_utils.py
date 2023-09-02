@@ -203,7 +203,6 @@ def get_pnet(inputs, features, genes, n_hidden_layers, direction, activation, ac
         print("maps[3]",len(maps[3]))
         print("maps[4]",len(maps[4]))
         print("maps[5]",len(maps[5]))
-        print(maps[5])
         
 #         print(pams.shape)
         for i, mapp in enumerate(maps[0:-1]):
