@@ -29,7 +29,7 @@ def build_pnet(data, maps, optimizer, w_reg, w_reg_outcomes, add_unk_genes=True,
     n_genes = len(genes)
     n_status = int(n_features/n_genes)
 
-    inputs = Input(shape=(n_features,), dtype='float32', name=f'Gene({n_genes})-Status({n_status})')
+    inputs = Input(shape=(n_features,), dtype='float32', name=f'Gene_{n_genes}_Status_{n_status}')
 
     w_reg0 = w_reg[0]
     w_reg_outcome0 = w_reg_outcomes[0]
