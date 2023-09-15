@@ -18,11 +18,12 @@ from sklearn import metrics
 
 # ---------------------------------------------------------------------------------------------------
 # building a model 
-def build_pnet(data, maps, optimizer, w_reg, w_reg_outcomes, add_unk_genes=True, sparse=True,
-               loss_weights=1.0, activation_decision = 'linear',
+def build_pnet(data, maps, tissue_name, optimizer, w_reg, w_reg_outcomes, add_unk_genes=True,
+               sparse=True, loss_weights=1.0, activation_decision = 'linear',
                dropout=0.5, use_bias=False, activation='tanh', loss='binary_crossentropy',
                n_hidden_layers=1, kernel_initializer='glorot_uniform',
                dropout_testing=False, non_neg=False):
+    print(f'\n\n\t\t{tissue_name}')
     feature_names = {}
     n_features = len(data.columns)
     genes = data.columns.levels[0]
@@ -74,14 +75,6 @@ def build_pnet(data, maps, optimizer, w_reg, w_reg_outcomes, add_unk_genes=True,
         print(f'    Layer_5: ({sum(maps[4].sum(axis=1)>0)})/({int(maps[4].values.sum())})')
         print(f'    Layer_6: ({sum(maps[5].sum(axis=1)>0)})/({int(maps[5].values.sum())})')
         print("#"*50)
-        print("Map is:")
-        print("     Layer_1 conncetion:", maps[0].shape)
-        print("     Layer_2 conncetion:", maps[1].shape)
-        print("     Layer_3 conncetion:", maps[2].shape)
-        print("     Layer_4 conncetion:", maps[3].shape)
-        print("     Layer_5 conncetion:", maps[4].shape)
-        print("     Layer_6 conncetion:", maps[5].shape)
-        print("#"*50)
 
         for i, mapp in enumerate(maps[0:-1]):
             w_reg = w_regs[i]
@@ -113,8 +106,9 @@ def build_pnet(data, maps, optimizer, w_reg, w_reg_outcomes, add_unk_genes=True,
     
     concatenated_outputs = Concatenate(axis=-1,name='Concatenate_outcomes')(decision_outcomes)
     final_output = Dense(1, activation='sigmoid',name='final_outcome')(concatenated_outputs)
-    model = Model(inputs=[inputs], outputs=final_output)
+    model = Model(inputs=[inputs], outputs=final_output, name=f'model_{tissue_name}')
     print(model.summary())
+    print("#"*50)
     model.compile(optimizer=optimizer, loss=['binary_crossentropy'], metrics=[f1],
                   loss_weights=loss_weights)
 
