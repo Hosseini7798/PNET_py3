@@ -1,7 +1,7 @@
-import os 
+import os
 
 import numpy as np
-import pandas as pd 
+import pandas as pd
 
 from keras import Input
 from keras.models import Model
@@ -60,21 +60,27 @@ def build_pnet(data, maps, optimizer, w_reg, w_reg_outcomes, add_unk_genes=True,
         w_regs = w_reg[1:]
         w_reg_outcomes = w_reg_outcomes[1:]
         dropouts = dropout[1:]
-        print('(Genes with at least 1 conncetion to next layer)/(total conncetion to next layer)')
-        print(f'({sum(maps[0].sum(axis=1)>0)})/({int(maps[0].values.sum())})')
-        print(f'({sum(maps[1].sum(axis=1)>0)})/({int(maps[1].values.sum())})')
-        print(f'({sum(maps[2].sum(axis=1)>0)})/({int(maps[2].values.sum())})')
-        print(f'({sum(maps[3].sum(axis=1)>0)})/({int(maps[3].values.sum())})')
-        print(f'({sum(maps[4].sum(axis=1)>0)})/({int(maps[4].values.sum())})')
-        print(f'({sum(maps[5].sum(axis=1)>0)})/({int(maps[5].values.sum())})')
+        print('Maps shape:')        
+        for i in range(len(maps)):
+            print(f'    Layers_{i+1}: ', maps[i].shape)
+        
+        print("#"*50)
+        print(f'Summary of maps connections:')
+        print(f'    (Genes with at least 1 conncetion to next layer)/(total conncetion to next layer)')
+        print(f'    Layer_1: ({sum(maps[0].sum(axis=1)>0)})/({int(maps[0].values.sum())})')
+        print(f'    Layer_2: ({sum(maps[1].sum(axis=1)>0)})/({int(maps[1].values.sum())})')
+        print(f'    Layer_3: ({sum(maps[2].sum(axis=1)>0)})/({int(maps[2].values.sum())})')
+        print(f'    Layer_4: ({sum(maps[3].sum(axis=1)>0)})/({int(maps[3].values.sum())})')
+        print(f'    Layer_5: ({sum(maps[4].sum(axis=1)>0)})/({int(maps[4].values.sum())})')
+        print(f'    Layer_6: ({sum(maps[5].sum(axis=1)>0)})/({int(maps[5].values.sum())})')
         print("#"*50)
         print("Map is:")
-        print("Layer 1 conncetion:", maps[0].shape)
-        print("Layer 2 conncetion:", maps[1].shape)
-        print("Layer 3 conncetion:", maps[2].shape)
-        print("Layer 4 conncetion:", maps[3].shape)
-        print("Layer 5 conncetion:", maps[4].shape)
-        print("Layer 6 conncetion:", maps[5].shape)
+        print("     Layer_1 conncetion:", maps[0].shape)
+        print("     Layer_2 conncetion:", maps[1].shape)
+        print("     Layer_3 conncetion:", maps[2].shape)
+        print("     Layer_4 conncetion:", maps[3].shape)
+        print("     Layer_5 conncetion:", maps[4].shape)
+        print("     Layer_6 conncetion:", maps[5].shape)
         print("#"*50)
 
         for i, mapp in enumerate(maps[0:-1]):
