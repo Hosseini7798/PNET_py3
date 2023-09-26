@@ -57,11 +57,11 @@ def load_data(filename, selected_genes=None):
     genes = all.columns
 
     if not selected_genes is None:
-        intersect = set.intersection(set(genes), selected_genes)
+        intersect = sorted(set.intersection(set(genes), selected_genes))
         if len(intersect) < len(selected_genes):
             # raise Exception('wrong gene')
             logging.warning('some genes dont exist in the original data set')
-        x = x.loc[:, sorted(intersect)]
+        x = x.loc[:, intersect]
         genes = intersect
     logging.info('loaded data %d samples, %d variables, %d responses ' % (x.shape[0], x.shape[1], response.shape[0]))
     logging.info(len(genes))
