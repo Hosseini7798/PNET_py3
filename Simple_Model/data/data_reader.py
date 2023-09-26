@@ -61,7 +61,7 @@ def load_data(filename, selected_genes=None):
         if len(intersect) < len(selected_genes):
             # raise Exception('wrong gene')
             logging.warning('some genes dont exist in the original data set')
-        x = x.loc[:, list(intersect)]
+        x = x.loc[:, sorted(intersect)]
         genes = intersect
     logging.info('loaded data %d samples, %d variables, %d responses ' % (x.shape[0], x.shape[1], response.shape[0]))
     logging.info(len(genes))
@@ -92,7 +92,8 @@ def load_CNV_burden(filename=gene_final_no_silent_no_intron):
     return x, response, samples, cols
 
 
-def load_data_type(data_type='gene', cnv_levels=5, cnv_filter_single_event=True, mut_binary=False, selected_genes=None):
+def load_data_type(data_type='gene', cnv_levels=5, cnv_filter_single_event=True,
+                   mut_binary=False, selected_genes=None):
     logging.info('loading {}'.format(data_type))
     if data_type == 'TMB':
         x, response, info, genes = load_TMB(gene_important_mutations_only)
@@ -273,7 +274,7 @@ class Data():
                  use_coding_genes_only=False, drop_AR=False,
                  balanced_data=False, cnv_split=False,
                  shuffle=False, selected_samples=None,
-                 test_size=0.3, stratify=True):
+                 test_size=0.2, stratify=True):
         
         self.test_size = test_size
         self.stratify = stratify
@@ -295,15 +296,16 @@ class Data():
             cols_list = []
 
             for t in data_type:
-                x, y, rows, cols = load_data_type(t, cnv_levels, cnv_filter_single_event, mut_binary, selected_genes)
+                x, y, rows, cols = load_data_type(t, cnv_levels, cnv_filter_single_event,
+                                                  mut_binary, selected_genes)
                 x_list.append(x), y_list.append(y), rows_list.append(rows), cols_list.append(cols)
             x, y, rows, cols = combine(x_list, y_list, rows_list, cols_list, data_type, combine_type,
                                        use_coding_genes_only)
             x = pd.DataFrame(x, columns=cols)
 
         else:
-            x, y, rows, cols = load_data_type(data_type, cnv_levels, cnv_filter_single_event, mut_binary,
-                                              selected_genes)
+            x, y, rows, cols = load_data_type(data_type, cnv_levels, cnv_filter_single_event,
+                                              mut_binary, selected_genes)
 
         if drop_AR:
 
@@ -360,13 +362,14 @@ class Data():
             rows_list = []
             cols_list = []
             for t in account_for_data_type:
-                x_, y_, rows_, cols_ = load_data_type(t, cnv_levels, cnv_filter_single_event, mut_binary,
-                                                      selected_genes)
+                x_, y_, rows_, cols_ = load_data_type(t, cnv_levels, cnv_filter_single_event,
+                                                      mut_binary, selected_genes)
                 x_df = pd.DataFrame(x_, columns=cols_, index=rows_)
                 x_list.append(x_df), y_list.append(y_), rows_list.append(rows_), cols_list.append(cols_)
 
             x_account_for = pd.concat(x_list, keys=account_for_data_type, join='inner', axis=1)
-            x_all = pd.concat([x_genomics, x_account_for], keys=['genomics', 'account_for'], join='inner', axis=1)
+            x_all = pd.concat([x_genomics, x_account_for],
+                              keys=['genomics', 'account_for'], join='inner', axis=1)
 
             common_samples = set(rows).intersection(x_all.index)
             x_all = x_all.loc[common_samples, :]
@@ -398,8 +401,8 @@ class Data():
         self.columns = cols
 
     
-    def get_train_test(self):
+    def get_train_test(self, random_state=42):
         if self.stratify:
-            return train_test_split(self.x, self.y, test_size=self.test_size, stratify=self.y, random_state=42)
+            return train_test_split(self.x, self.y, test_size=self.test_size, stratify=self.y, random_state=random_state)
         else:
-            return train_test_split(self.x, self.y, test_size=self.test_size, random_state=42)
+            return train_test_split(self.x, self.y, test_size=self.test_size, random_state=random_state)
