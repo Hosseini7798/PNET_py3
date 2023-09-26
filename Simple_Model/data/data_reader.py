@@ -205,7 +205,6 @@ def get_response():
     return labels
 
 
-# complete_features: make sure all the data_types have the same set of features_processing (genes)
 def combine(x_list, y_list, rows_list, cols_list, data_type_list, combine_type, use_coding_genes_only=False):
     cols_list_set = [set(list(c)) for c in cols_list]
 
@@ -213,7 +212,7 @@ def combine(x_list, y_list, rows_list, cols_list, data_type_list, combine_type, 
         cols = set.intersection(*cols_list_set)
     else:
         cols = set.union(*cols_list_set)
-
+    
     if use_coding_genes_only:
         f = '_database/HUGO_genes/protein-coding_gene_with_coordinate_minimal.txt'
         coding_genes_df = pd.read_csv(f, sep='\t', header=None)
@@ -222,7 +221,7 @@ def combine(x_list, y_list, rows_list, cols_list, data_type_list, combine_type, 
         cols = cols.intersection(coding_genes)
 
     # the unique (super) set of genes
-    all_cols = list(cols)
+    all_cols = sorted(cols)
 
     all_cols_df = pd.DataFrame(index=all_cols)
 
@@ -399,7 +398,6 @@ class Data():
         self.y = y
         self.info = rows
         self.columns = cols
-
     
     def get_train_test(self, random_state=42):
         if self.stratify:
