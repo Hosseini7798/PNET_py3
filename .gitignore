@@ -5,7 +5,10 @@
 _logs/
 _plots 2/
 pnet*
+**/*.npy
+**/*.jpg
+**/*.png
 Simple_Model/_database
 Simple_Model/maps.pkl
-Simple_Model/tissue_maps.pkl
+Simple_Model/tissues_maps.pkl
 Simple_Model/network/Reactome2023/new
