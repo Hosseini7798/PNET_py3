@@ -2,11 +2,14 @@ import pickle
 import logging
 import os
 import time
+import pandas as pd
 
 from keras.models import Sequential
 from matplotlib import pyplot as plt
+from sklearn import metrics
 
 
+#------------------------------------------------------------------------------------------------------ 
 def save_model(model, filename):
     print('saving model in', filename)
     f = file(filename + '.pkl', 'wb')
@@ -16,6 +19,7 @@ def save_model(model, filename):
     f.close()
 
 
+#------------------------------------------------------------------------------------------------------ 
 def load_model(file_name):
     f = file(file_name + '.pkl', 'rb')
     # theano.config.reoptimize_unpickled_function = False
@@ -25,7 +29,7 @@ def load_model(file_name):
     elapsed_time = end - start
     return model
 
-
+#------------------------------------------------------------------------------------------------------ 
 def print_model(model, level=1):
     for i, l in enumerate(model.layers):
         indent = '  ' * level + '-'
@@ -35,7 +39,7 @@ def print_model(model, level=1):
         else:
             logging.info('{} {} {} {}'.format(indent, i, l.name, l.output_shape))
 
-
+#------------------------------------------------------------------------------------------------------ 
 def get_layers(model, level=1):
     layers = []
     for i, l in enumerate(model.layers):
@@ -49,11 +53,11 @@ def get_layers(model, level=1):
     return layers
 
 
+#------------------------------------------------------------------------------------------------------ 
 from model.coef_weights_utils import get_gradient_weights, get_permutation_weights, get_weights_linear_model, \
     get_gradient_weights_with_repeated_output, get_weights_gradient_outcome, \
     get_deep_explain_scores, get_shap_scores, get_skf_weights
 import numpy as np
-
 
 def get_coef_importance(model, X_train, y_train, target, feature_importance, detailed=True, **kwargs):
     if feature_importance.startswith('skf'):
@@ -99,7 +103,7 @@ def get_coef_importance(model, X_train, y_train, target, feature_importance, det
         coef_ = None
     return coef_
 
-
+#------------------------------------------------------------------------------------------------------ 
 def apply_models(models, inputs):
     output = inputs
     for m in models:
@@ -107,59 +111,60 @@ def apply_models(models, inputs):
 
     return output
 
-
-def plot_channels(history, channels, filename, folder_name):
-    if not os.path.exists(folder_name):
-        os.makedirs(folder_name)
-
-    plt.figure()
-    for k in channels:
-        v = history[k]
-        plt.plot(v)
-    plt.legend(channels)
-    filename = os.path.join(folder_name, filename)
-    plt.savefig(filename)
-    plt.close()
-
-
-def plot_history(history, folder_name):
-    keys = list(history.keys())
-
-    losses = [x for x in keys if ('_loss' in x) and (x != 'val_loss')]
-    val_losses = [x for x in losses if 'val_' in x]
-    train_losses = [x for x in losses if ('val_' not in x) and (x != 'loss')]
-    # train_losses = [x.replace('val_', '') for x in val_losses ]
-
-    monitors = [x for x in keys if 'loss' not in x]
-    val_monitors = [x for x in monitors if 'val_' in x]
-    train_monitors = [x for x in monitors if ('val_' not in x) and (x != 'loss') and (x != 'lr')]
-    # train_monitors= [x.replace('val_', '') for x in val_monitors]
-
-    monitors.sort()
-    val_monitors.sort()
-    train_monitors.sort()
-
-    train_losses.sort()
-    val_losses.sort()
-
-    print(val_losses)
-    print(train_losses)
-    print(monitors)
-
-    plot_channels(history, val_monitors, 'val_monitors', folder_name)
-    plot_channels(history, train_monitors, 'train_monitors', folder_name)
-    # plot_channels(history, ['val_loss', 'loss'], 'loss')
-    for v, t in zip(val_monitors, train_monitors):
-        plot_channels(history, [v, t], t, folder_name)
-
-    plot_channels(history, val_losses, 'validation_loss', folder_name)
-    plot_channels(history, train_losses, 'training_loss', folder_name)
-
-    if 'val_loss' in keys:
-        plot_channels(history, ['val_loss', 'loss'], 'loss', folder_name)
+#------------------------------------------------------------------------------------------------------ 
+def plot_history(history):
+    his = history.history
+    if his.get('lr'):
+        lr = his.pop('lr')
+    val_his = [i for i in his.keys() if i.__contains__('val')]
+    train_his = [i for i in his.keys() if not i.__contains__('val')]
+    n_his = len(train_his)
+    if len(val_his) == len(train_his):
+        plt.figure(figsize=(12, n_his*5))
+        for idx, (t,v) in enumerate(zip(train_his, val_his)):    
+            plt.subplot(n_his, 2, idx+1)
+            plt.plot(his[t], label=t)
+            plt.plot(his[v], label=v)
+            plt.legend()
+        plt.tight_layout()
+        plt.show()
     else:
-        plot_channels(history, ['loss'], 'loss', folder_name)
-
-    for v, t in zip(val_losses, train_losses):
-        plot_channels(history, [v, t], t, folder_name)
+        plt.figure(figsize=(12, 6))
+        plt.subplot(1, 2, 1)
+        for i in train_his:
+            if i.__contains__('_loss'):
+                plt.plot(his[i],label=i)
+                plt.legend()
+        plt.subplot(1, 2, 2)
+        for i in train_his:
+            if i.__contains__('_f1'):
+                plt.plot(his[i],label=i)
+                plt.legend()
+        plt.tight_layout()
+        plt.show()
     pass
+
+#------------------------------------------------------------------------------------------------------ 
+def get_th(y_validate, pred_scores, return_result=False):
+    thresholds = np.arange(0.1, 0.9, 0.01)
+    scores = []
+    for th in thresholds:
+        y_pred = pred_scores > th
+        f1 = metrics.f1_score(y_validate, y_pred)
+        precision = metrics.precision_score(y_validate, y_pred)
+        recall = metrics.recall_score(y_validate, y_pred)
+        accuracy = metrics.accuracy_score(y_validate, y_pred)
+        score = {}
+        score['accuracy'] = accuracy
+        score['precision'] = precision
+        score['f1'] = f1
+        score['recall'] = recall
+        score['th'] = th
+        scores.append(score)
+    ret = pd.DataFrame(scores)
+    best = ret[ret.f1 == max(ret.f1)]
+    th = best.th.values[0]
+    print(f'Best threshold to maximize the F1-score: {th}\n')
+    print(f'Metrics for best threshold:\n{best}')
+    if return_result:
+        return ret

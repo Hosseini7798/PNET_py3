@@ -1,16 +1,45 @@
-# import theano
-
+import tensorflow as tf 
 import keras
 import numpy as np
 from keras import regularizers
 from keras.layers import Layer
-# from keras import initializations
 from keras.initializers import glorot_uniform, Initializer
 from keras import activations, initializers, constraints
-# our layer will take input shape (nb_samples, 1)
 from keras.regularizers import Regularizer
 
 
+
+class GeneSelection(Layer):
+    def __init__(self, mask, n_status, **kwargs):
+        self.mask = mask
+        self.n_status = n_status
+        self.rep_mask = tf.repeat(input=tf.constant(mask.reshape(1,-1),
+                                                dtype=tf.float32),repeats= n_status)
+        super(GeneSelection, self).__init__(**kwargs)
+
+    def call(self, inputs):
+        result = inputs * self. rep_mask
+        return result
+    
+    def get_config(self):
+        config = super(GeneSelection, self).get_config()
+        config.update({
+            'mask': self.mask.tolist(),  # Convert mask to a serializable format
+            'n_status': self.n_status})
+        return config
+
+
+class TissueSpecific(Layer):
+    def __init__(self, **kwargs):
+        super(TissueSpecific, self).__init__(**kwargs)
+
+    def call(self, inputs, mask):
+        selected_data = tf.boolean_mask(inputs, mask, axis=1)
+        return selected_data
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], sum(mask))
+
+    
 class Attention(Layer):
     def __init__(self, **kwargs):
         # self.init = initializations.get('glorot_uniform')

@@ -41,7 +41,7 @@ nn_pathway = {
                 'data_params': data_base,
                 'add_unk_genes': False,
                 'shuffle_genes': False,
-                'single_outputs':True,
+                'single_outputs':False,
                 'kernel_initializer': 'lecun_uniform',
                 'n_hidden_layers': n_hidden_layers,
                 'attention': False,
